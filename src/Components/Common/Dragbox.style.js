@@ -7,9 +7,10 @@ export const DragBoxWrapper = styled.div`
   border-color: rgb(102, 102, 102);
   border-style: dashed;
   border-radius: 5px;
+  cursor: pointer;
 
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 `

@@ -1,13 +1,86 @@
-import React from 'react'
+import React, {useState, useEffect, useRef} from 'react'
+import Dropzone from 'react-dropzone'
+import csv from 'csv';
+import DragBox from 'Components/Common/DragBox'
 
 import { Button} from 'react-bootstrap';
 import { StepOneWrapper } from './Steps.style'
 
 export default function One(props) {
+  const [fileData, setFileData] = useState({
+    address: "",
+    bedRoom: "",
+    bathRoom: "",
+    description: ""
+  })
+  const [uploadCSV, setUploadCSV] = useState(false)
+
+  const handleUploadCSV = () => setUploadCSV(true)
+
+  const onDrop = (newFile) => {
+    console.log("onDrop -> newFile", newFile)
+
+    try {   
+      const reader = new FileReader();
+      let file = newFile[0] //ONLY ONE FILE ALLOWED 
+  
+      reader.onload = () => {
+        csv.parse(reader.result, (err, data) => {
+          console.log("reader.onload -> data", data)
+          if(err) {
+            throw err
+          }
+
+          //NO EMPTY CSV
+          if(data && data.length === 1 && data[0].length === 1 && data[0][0] === "")
+            alert('Empty file is not allowed')
+
+          //ONLY FIRST ROW DATA SHOULD BE PROCESSED FURTHER...
+          if(data && data.length > 1) {
+            alert('Multiple rows are not allowed!')
+          }
+
+          setFileData({
+            address : data[0][0],
+            bedRoom : data[0][1],
+            bathRoom : data[0][2],
+            description : data[0][3]
+          })
+        });
+      };
+      reader.readAsBinaryString(file);
+    } catch (error) {
+      //CATCH ERROR AND DO SOMETHING...
+      console.log('CATCH BLOCK', error)
+    }
+  }
+
+  useEffect(() => {
+    console.log('USE EFFECT CALLED', fileData)
+    // props.changeValues()
+  }, [JSON.stringify(fileData)])
+
   return (
+    <>
     <div>
       <Button variant="primary" onClick={props.handleNext}>Add From Scratch</Button>{' '}
-      <Button variant="secondary">Upload CSV</Button>{' '}
+      <Button variant="secondary" onClick={handleUploadCSV}>Upload CSV</Button>{' '}
     </div>
+    {/* CSV files, for example, are reported as text/plain under macOS but as application/vnd.ms-excel under Windows.  */}
+    {
+      uploadCSV && <div className="dropzone">
+        <Dropzone  onDrop={onDrop} accept='text/*, application/vnd.ms-excel,' multiple={false}>
+            {({getRootProps, getInputProps, isDragReject}) => (
+              <DragBox 
+                root={getRootProps()}
+                input={getInputProps()}
+                reject={isDragReject}
+                message={'Only CSV file and one file at a time!'}
+              />
+            )}
+        </Dropzone> 
+      </div>
+    }
+    </>
   )
 }

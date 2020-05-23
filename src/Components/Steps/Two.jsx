@@ -8,6 +8,28 @@ import { StepTwoWrapper } from './Steps.style'
 export default function Two(props) {
 console.log("Two -> props", props)
   const [isFormFilled, setFormToFilled] = useState(true)
+
+  const validate = values => {
+  console.log("Two -> values", values)
+    const errors = {};
+    if (!values.address) {
+      errors.address = 'Required';
+    }
+  
+    if (!values.bedRoom) {
+      errors.bedRoom = 'Required';
+    } else if (values.bedRoom.length > 10) {
+      errors.bedRoom = 'Must be 20 characters or less'; 
+    }
+  
+    if (!values.bathRoom) {
+      errors.bathRoom = 'Required';
+    } else if (values.bathRoom.length > 5) {
+      errors.bathRoom = 'Must be 5 characters or less';
+    }
+  
+    return errors;
+  };
   
   const schema = yup.object({
     address: yup.string().required("Address is Required!"),
@@ -46,8 +68,9 @@ console.log("Two -> props", props)
                 type="text"
                 name="address"
                 value={values.address}
-                onChange={handleChange}
-                isInvalid={!!errors.address}
+                onChange={handleChange('address')}
+                onBlur={handleBlur}
+                isInvalid={errors.address}
                 isValid={touched.address && !errors.address}
               />
               <Form.Control.Feedback type="invalid">
@@ -66,7 +89,8 @@ console.log("Two -> props", props)
                 name="bedRoom"
                 value={values.bedRoom}
                 onChange={handleChange}
-                isInvalid={!!errors.bedRoom}
+                onBlur={handleBlur}
+                isInvalid={errors.bedRoom}
                 isValid={touched.bedRoom && !errors.bedRoom}
               />
               <Form.Control.Feedback type="invalid">
@@ -85,7 +109,8 @@ console.log("Two -> props", props)
                 name="bathRoom"
                 value={values.bathRoom}
                 onChange={handleChange}
-                isInvalid={!!errors.bathRoom}
+                onBlur={handleBlur}
+                isInvalid={errors.bathRoom}
                 isValid={touched.bathRoom && !errors.bathRoom}
               />
               <Form.Control.Feedback type="invalid">
@@ -109,7 +134,7 @@ console.log("Two -> props", props)
           </Form.Group>
           {console.log('ERRR LENGTH', Object.entries(errors).length,  Object.entries(values).length)}
           <Button variant="secondary" onClick={props.handleBack}>Back</Button>{' '}
-          <Button variant="primary" disabled={Object.entries(values).length > 0 && Object.entries(errors).length === 0 ? false : true} onClick={handleSubmit}>Submit</Button>
+          <Button variant="primary" disabled={Object.entries(values).length > 0 && Object.entries(errors).length === 0 ? true : false} onClick={handleSubmit}>Submit</Button>
         </Form>
       )}
     </Formik>

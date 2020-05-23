@@ -54,9 +54,9 @@ export const StepConnecter = styled.div`
 
 export const StepContentWrapper = styled.div`
   background-color : white;
-  height : 60vh;
   margin-top: 20px;
   width : 100%;
+  height : 100vh;
 
   display : flex;
   flex-direction : column;
@@ -77,6 +77,8 @@ export const StepContentWrapper = styled.div`
   .all-files {
     height : calc(100% - 50px - 170px);
     display : flex;
+    flex-wrap : wrap;
+    padding : 20px;
   }
 
   .actions {
@@ -84,8 +86,20 @@ export const StepContentWrapper = styled.div`
   }
 
   .img-preview {
-    margin: 0 10px;
+    margin: 10px;
     height: max-content;
     width: max-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .image-control {
+      margin-top: 10px;
+      text-align: center;
+
+      .name {
+        margin-left : 5px;
+      }
+    }
   }
 `
