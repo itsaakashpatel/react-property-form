@@ -6,9 +6,19 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "bootstrap": "^4.5.0",
+    "csv": "^5.3.2",
+    "formik": "^2.1.4",
+    "prop-types": "^15.7.2",
     "react": "^16.13.1",
+    "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-dropzone": "^11.0.1",
+    "react-load-script": "0.0.6",
+    "react-scripts": "3.4.1",
+    "styled-components": "^5.1.0",
+    "uuid": "^8.1.0",
+    "yup": "^0.29.0"
   },
   "scripts": {
     "start": "react-scripts start",
