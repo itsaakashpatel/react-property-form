@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 
-import { Card } from 'react-bootstrap';
 import { COLORS} from 'Styles/Constants';
 
 export const CardWrapper = styled.div`
@@ -83,6 +82,7 @@ export const StepContentWrapper = styled.div`
 
   .actions {
     height : 50px;
+    text-align: center;
   }
 
   .img-preview {

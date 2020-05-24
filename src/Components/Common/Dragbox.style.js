@@ -1,4 +1,9 @@
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
+
+const fadeAnimation = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`
 
 export const DragBoxWrapper = styled.div`
   position: relative;
@@ -13,4 +18,7 @@ export const DragBoxWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  animation-name: ${fadeAnimation};
+  animation-duration: 5s;
 `

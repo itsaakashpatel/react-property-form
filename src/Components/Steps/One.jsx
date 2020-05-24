@@ -1,12 +1,14 @@
 import React, {useState, useEffect, useRef} from 'react'
 import Dropzone from 'react-dropzone'
 import csv from 'csv';
+import PropTypes from 'prop-types';
+import { Button} from 'react-bootstrap';
+
+//LOCAL COMPONENTS
 import DragBox from 'Components/Common/DragBox'
 
-import { Button} from 'react-bootstrap';
-import { StepOneWrapper } from './Steps.style'
 
-export default function One(props) {
+function One(props) {
   const [fileData, setFileData] = useState({
     address: "",
     bedRoom: "",
@@ -14,9 +16,12 @@ export default function One(props) {
     description: ""
   })
   const [uploadCSV, setUploadCSV] = useState(false)
+  const initValues = useRef(fileData)
 
+  //ENABLE CSV UPLOADING...
   const handleUploadCSV = () => setUploadCSV(true)
 
+  //HANDLE WHAT TO DO WHEN FILE GETS UPLOADED...
   const onDrop = (newFile) => {
     console.log("onDrop -> newFile", newFile)
 
@@ -26,7 +31,6 @@ export default function One(props) {
   
       reader.onload = () => {
         csv.parse(reader.result, (err, data) => {
-          console.log("reader.onload -> data", data)
           if(err) {
             throw err
           }
@@ -56,20 +60,20 @@ export default function One(props) {
   }
 
   useEffect(() => {
-    console.log('USE EFFECT CALLED', fileData)
-    // props.changeValues()
-  }, [JSON.stringify(fileData)])
+    if(initValues.current !== fileData)
+      props.changeValues(fileData)
+  }, [fileData])
 
   return (
     <>
     <div>
-      <Button variant="primary" onClick={props.handleNext}>Add From Scratch</Button>{' '}
+      <Button variant="primary" onClick={props.addDataFromScratch}>Add From Scratch</Button>{' '}
       <Button variant="secondary" onClick={handleUploadCSV}>Upload CSV</Button>{' '}
     </div>
     {/* CSV files, for example, are reported as text/plain under macOS but as application/vnd.ms-excel under Windows.  */}
     {
       uploadCSV && <div className="dropzone">
-        <Dropzone  onDrop={onDrop} accept='text/*, application/vnd.ms-excel,' multiple={false}>
+        <Dropzone  onDrop={onDrop} accept='application/vnd.ms-excel,text/*, ' multiple={false}>
             {({getRootProps, getInputProps, isDragReject}) => (
               <DragBox 
                 root={getRootProps()}
@@ -84,3 +88,10 @@ export default function One(props) {
     </>
   )
 }
+
+One.propTypes = {
+  addDataFromScratch: PropTypes.func,
+  changeValues: PropTypes.func,
+}
+
+export default One

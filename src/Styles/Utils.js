@@ -58,4 +58,9 @@ export const UtilityStyles = createGlobalStyle`
         text-align  : center;
         width       : 100%;
     }
+
+    .required-field .form-label:after {
+      content:"*";
+      color:red;
+    }
 `;

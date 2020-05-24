@@ -1,4 +1,7 @@
 import React from 'react'
+import PropTypes from 'prop-types';
+
+//STYLE
 import { DragBoxWrapper } from './Dragbox.style'
 
 function DragBox(props) {
@@ -9,6 +12,13 @@ function DragBox(props) {
         {props.reject && <div style={{ color : 'red'}}>{props.message}</div>}
     </DragBoxWrapper>
   )
+}
+
+DragBox.propTypes = {
+  root: PropTypes.object,
+  active: PropTypes.func,
+  reject : PropTypes.bool,
+  message : PropTypes.string
 }
 
 export default React.memo(DragBox)

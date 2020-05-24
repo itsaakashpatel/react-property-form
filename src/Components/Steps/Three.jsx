@@ -1,32 +1,57 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import Dropzone from 'react-dropzone'
-import { Button, Alert, Toast } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { v4 as uuidv4 } from 'uuid';
+import PropTypes from 'prop-types';
 
+//LOCAL COMPONENTS
 import DragBox from 'Components/Common/DragBox'
+import FilePreview from './FilePreview'
 
-export default function Three(props) {
+function Three(props) {
 
   const [files, setFiles] = useState([])
-  const [errors, setErrors] = useState([])
+  const [errors, setErrors] = useState([]) //SAVE ERRORS WHILE FILE UPLOADING...
+
+  useEffect(() => {
+    setFiles(props.images)
+  }, [props])
+
+  useEffect(() => {
+    //DO SOMETHING WHEN FILE ERRORS COME...
+    console.log('FILE ERRORS', errors)
+  }, [errors])
 
   const onDrop = (newFiles) => {
-    //REMOVE DUPLICATES
+
+    //REMOVE DUPLICATES, ONLY NEW IMAGES
     let filteredFiles = newFiles.filter(file => files.findIndex(item => item.name === file.name) === -1)
+
+    //If NO NEW IMAGES
+    if(!filteredFiles.length)
+      return false
+    
+    //MAX IMAGES ARE ALLOWED ONLY
+    if(files.concat(filteredFiles).length > process.env.REACT_APP_MAX_FILE_ALLOWED) {
+      alert('You have reached max file limit!, upto 4 files are allowed')
+      return false
+    }
+
     let promiseArray = []
     let mappedArray = filteredFiles.map(file => {
       let updatedFileObj =  Object.assign(file, {
         preview: URL.createObjectURL(file),
         key  : uuidv4(),
-        checked : false
+        isFeaturedImage : false
       })
+      //GET BASE64 STRING FOR IMAGE
       promiseArray.push(getBase64(file))
       return updatedFileObj
     })
 
     Promise.allSettled(promiseArray).then(result => {
       let errorArray = []
-      let finalArray = []
+      let finalArray = [] 
       result.forEach(element => {
         if(element.status === "fulfilled") {
           let findElement = mappedArray.splice(mappedArray.findIndex(item => item.key === element.value.key), 1)
@@ -38,12 +63,8 @@ export default function Three(props) {
           
       });
       setErrors(errorArray) //SAVING FILE ERRORS AT ONE PLACE...
+      setFiles(files.concat(finalArray))
 
-      //MAX FILES ARE ALLOWED
-      if(files.concat(finalArray).length <= process.env.REACT_APP_MAX_FILE_ALLOWED)
-        setFiles(files.concat(finalArray))
-      else
-        alert('You have reached max file limit!, upto 4 files are allowed')
     }).catch(error => {
       //DO SOMETHING WHEN ERROR COMES
       console.log("onDrop -> CATCH -> error", error)
@@ -73,67 +94,58 @@ export default function Three(props) {
     
   }
 
-  const previewStyle = {
-    display: 'inline',
-    width: 100,
-    height: 100,
-    border: '2px solid #545b62',
-    borderRadius: '5px'
-  };
 
   const setAsPreviewImage = (key) => {
     let mappedFiles = files.map(file => {
       if(file.key === key)
-        file.checked = true
+        file.isFeaturedImage = true
       else
-        file.checked = false
+        file.isFeaturedImage = false
       return file
     })
     setFiles(mappedFiles)
   }
 
-  const FilePreview = (file) => {
-    console.log("FilePreview -> file encoded", file)
-    return(
-      <div className="img-preview" key={file.key}>
-        <img
-          alt="Preview"
-          src={file.encoded}
-          style={previewStyle}
-        />
-        <div className="image-control">
-          <input type="checkbox" checked={file.checked} onChange={() => setAsPreviewImage(file.key)}/>
-          <strong className="name">{file.name}</strong>
-        </div>
-      </div>
-    )
-  }
-
-
   return (
     <>
       <div className="dropzone">
         <Dropzone accept="image/*" onDrop={onDrop}>
-            {({getRootProps, getInputProps, isDragReject}) => (
-              <DragBox 
-                root={getRootProps()}
-                input={getInputProps()}
-                reject={isDragReject}
-                message={'File type not accepted, sorry!'}
-              />
-            )}
-        </Dropzone> 
+          {({ getRootProps, getInputProps, isDragReject }) => (
+            <DragBox
+              root={getRootProps()}
+              input={getInputProps()}
+              reject={isDragReject}
+              message={"File type not accepted, sorry!"}
+            />
+          )}
+        </Dropzone>
       </div>
       <div className="all-files">
-        {
-          files.length > 0 && 
-          files.map(file => FilePreview(file))
-        }
+          {files.length > 0 &&
+            files.map((file) => (
+              <FilePreview
+                key={file.key}
+                file={file}
+                setAsPreviewImage={setAsPreviewImage}
+              />
+          ))}
       </div>
       <div className="actions">
-        <Button variant="secondary" onClick={props.handleBack}>Back</Button>{' '}
-        <Button variant="primary">Submit</Button>{' '}
+        <Button variant="secondary" onClick={props.handleBack}>
+          Back
+        </Button>{" "}
+        <Button variant="primary" onClick={() => props.submitForm(files)}>
+          Submit
+        </Button>{" "}
       </div>
     </>
-  )
+  );
 }
+
+Three.propTypes = {
+  handleBack: PropTypes.func.isRequired,
+  submitForm: PropTypes.func.isRequired,
+  images : PropTypes.array,
+}
+
+export default Three
